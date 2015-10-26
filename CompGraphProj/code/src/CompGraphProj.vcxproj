@@ -103,7 +103,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)\temp\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(SolutionDir)\temp\$(TargetName).pgd</ProfileGuidedDatabase>
-      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x86\SDL2.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x86\SDL2.lib;d3d11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
@@ -133,7 +133,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)\temp\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(SolutionDir)\temp\$(TargetName).pgd</ProfileGuidedDatabase>
-      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;d3d11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
@@ -159,7 +159,7 @@
       <ProgramDatabaseFile>$(SolutionDir)\temp\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(SolutionDir)\temp\$(TargetName).pgd</ProfileGuidedDatabase>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x86\SDL2.lib;..\..\3dparty\sdl2\lib\x86\SDL2main.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x86\SDL2.lib;d3d11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,11 +178,29 @@
       <ProgramDatabaseFile>$(SolutionDir)\temp\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(SolutionDir)\temp\$(TargetName).pgd</ProfileGuidedDatabase>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;..\..\3dparty\sdl2\lib\x64\SDL2main.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;..\..\3dparty\sdl2\lib\x64\SDL2main.lib;d3d11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
