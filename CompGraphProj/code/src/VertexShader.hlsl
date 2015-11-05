@@ -1,16 +1,25 @@
-struct VS_OUTPUT {
+cbuffer ConstantBuffer : register( b0 ) {
+    matrix ModelViewProjection;
+};
+
+
+struct VsInput {
+    float4 pos : POSITION;
+    float2 uv : TEXCOORD0;
+};
+
+
+struct VsOutput {
     float4 pos : SV_POSITION;
     float4 color : COLOR0;
 };
 
-cbuffer ConstantBuffer : register(b0) {
-	matrix model;
-}
 
-VS_OUTPUT main(float4 pos : POSITION, float4 color : COLOR) {
-	VS_OUTPUT output = (VS_OUTPUT)0;
-	output.pos = mul(pos, model);
-	output.pos.x = output.pos.x / 1.6f;
-	output.color = color;
-	return output;
+VsOutput main( VsInput In ) {
+    VsOutput Out;
+    Out.pos = mul( In.pos, ModelViewProjection );
+
+    // get some color from texture coords
+	Out.color = float4( In.uv.x, In.uv.y, 0.5, 1 );
+	return Out;
 }
