@@ -14,7 +14,7 @@ using f64 = double;
 
 struct Vertex {
 	DirectX::XMFLOAT3 pos;
-	DirectX::XMFLOAT4 color;
+	DirectX::XMFLOAT2 uv;
 };
 
 struct ConstantBuffer {
@@ -34,7 +34,8 @@ ID3D11PixelShader*      pixelShader = nullptr;
 ID3D11Buffer*           indexBuffer = nullptr;
 ID3D11Buffer*           constantBuffer = nullptr;
 
-DirectX::XMMATRIX       objProjection;
+u32						renderWidth = 0;
+u32						renderHeight = 0;
 f32                     angle = 0.0f;
 
 HRESULT InitializeD3D11( HWND hwnd, u32 width, u32 height );
@@ -189,6 +190,9 @@ HRESULT InitializeD3D11( HWND hwnd, u32 width, u32 height ) {
 	vp.TopLeftY = 0;
 	d3d11DeviceContext->RSSetViewports( 1, &vp );
 
+	renderWidth = width;
+	renderHeight = height;
+
 	return S_OK;
 }
 
@@ -242,7 +246,6 @@ void ReleaseD3D11() {
 
 //
 HRESULT CreateObject() {
-
 	u32 compileFlags = 0;;
 #ifdef _DEBUG
 	compileFlags |= D3DCOMPILE_DEBUG;
@@ -260,8 +263,8 @@ HRESULT CreateObject() {
 		return result;
 
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,							  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	u32 numElements = ARRAYSIZE( layout );
 	result = d3d11Device->CreateInputLayout( layout, numElements, blob->GetBufferPointer(), blob->GetBufferSize(), &vertexLayout );
@@ -284,15 +287,35 @@ HRESULT CreateObject() {
 
 	// создание вершинного буфера
 	const Vertex vertices[] = {
-		{ XMFLOAT3( -0.50f, -0.50f, 0.50f ), XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
-		{ XMFLOAT3( -0.50f, 0.50f, 0.50f ), XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) },
-		{ XMFLOAT3( 0.50f, -0.50f, 0.50f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
-		{ XMFLOAT3( 0.50f, 0.50f, 0.50f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
+		{ { -1.0f, 1.0f,  -1.0f }, { 1.0f, 0.0f } },
+		{ { 1.0f,  1.0f,  -1.0f }, { 0.0f, 0.0f } },
+		{ { 1.0f,  1.0f,  1.0f  }, { 0.0f, 1.0f } },
+		{ { -1.0f, 1.0f,  1.0f  }, { 1.0f, 1.0f } },
 
-		{ XMFLOAT3( -0.50f, -0.50f, -0.50f ), XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
-		{ XMFLOAT3( -0.50f, 0.50f, -0.50f ), XMFLOAT4( 1.0f, 1.0f, 0.0f, 1.0f ) },
-		{ XMFLOAT3( 0.50f, -0.50f, -0.50f ), XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
-		{ XMFLOAT3( 0.50f, 0.50f, -0.50f ), XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) },
+		{ { -1.0f, -1.0f, -1.0f }, { 0.0f, 0.0f } },
+		{ { 1.0f,  -1.0f, -1.0f }, { 1.0f, 0.0f } },
+		{ { 1.0f,  -1.0f, 1.0f  }, { 1.0f, 1.0f } },
+		{ { -1.0f, -1.0f, 1.0f  }, { 0.0f, 1.0f } },
+
+		{ { -1.0f, -1.0f, 1.0f  }, { 0.0f, 1.0f } },
+		{ { -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f } },
+		{ { -1.0f, 1.0f,  -1.0f }, { 1.0f, 0.0f } },
+		{ { -1.0f, 1.0f,  1.0f  }, { 0.0f, 0.0f } },
+
+		{ { 1.0f,  -1.0f, 1.0f  }, { 1.0f, 1.0f } },
+		{ { 1.0f,  -1.0f, -1.0f }, { 0.0f, 1.0f } },
+		{ { 1.0f,  1.0f,  -1.0f }, { 0.0f, 0.0f } },
+		{ { 1.0f,  1.0f,  1.0f  }, { 1.0f, 0.0f } },
+
+		{ { -1.0f, -1.0f, -1.0f }, { 0.0f, 1.0f } },
+		{ { 1.0f,  -1.0f, -1.0f }, { 1.0f, 1.0f } },
+		{ { 1.0f,  1.0f,  -1.0f }, { 1.0f, 0.0f } },
+		{ { -1.0f, 1.0f,  -1.0f }, { 0.0f, 0.0f } },
+
+		{ { -1.0f, -1.0f, 1.0f  }, { 1.0f, 1.0f } },
+		{ { 1.0f,  -1.0f, 1.0f  }, { 0.0f, 1.0f } },
+		{ { 1.0f,  1.0f,  1.0f  }, { 0.0f, 0.0f } },
+		{ { -1.0f, 1.0f,  1.0f  }, { 1.0f, 0.0f } },
 	};
 	D3D11_BUFFER_DESC bd;
 	memset( &bd, 0, sizeof( bd ) );
@@ -310,24 +333,25 @@ HRESULT CreateObject() {
 		return result;
 
 	// создание буфера индексов
+	// indices in clock-wise order
 	const u16 indices[] = {
-		0, 1, 2,
-		1, 3, 2,
+		3, 1, 0,
+		2, 1, 3,
 
-		5, 0, 4,
-		5, 1, 0,
+		6, 4, 5,
+		7, 4, 6,
 
-		6, 7, 4,
-		4, 7, 5,
+		11, 9, 8,
+		10, 9, 11,
 
-		2, 3, 6,
-		3, 7, 6,
+		14, 12, 13,
+		15, 12, 14,
 
-		5, 3, 1,
-		5, 7, 3,
+		19, 17, 16,
+		18, 17, 19,
 
-		0, 2, 6,
-		6, 4, 0,
+		22, 20, 21,
+		23, 20, 22
 	};
 	memset( &bd, 0, sizeof( bd ) );
 	bd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -356,14 +380,33 @@ HRESULT CreateObject() {
 
 
 //
+inline f32 ToRad( f32 deg ) {
+	const float PI = 3.141592654f;
+	return deg * PI / 180.0f;
+}
+
+
+//
 void Rotate() {
-	angle += 0.001f;
-	DirectX::XMFLOAT3 pos( 1, 1, 1 );
-	DirectX::XMVECTOR normal = DirectX::XMLoadFloat3( &pos );
-	objProjection = DirectX::XMMatrixRotationAxis( normal, angle );
+	angle += 0.0002f;
+
+	using namespace DirectX;
+
+	XMFLOAT3 pos( 1, 1, 1 );
+	XMVECTOR normal = DirectX::XMLoadFloat3( &pos );
+	XMMATRIX modelViewProjection = DirectX::XMMatrixRotationAxis( normal, angle );
+
+	const XMVECTOR Eye = { 0, 0, -5 };
+	const XMVECTOR Focus = { 0, 0, 1 };
+	const XMVECTOR Up = { 0, 1, 0 };
+	modelViewProjection *= XMMatrixLookAtLH( Eye, Focus, Up );
+
+	const f32 FovY = ToRad( 80.0f );
+	const f32 Aspect = ( f32 )renderWidth / renderHeight;
+	modelViewProjection *= XMMatrixPerspectiveFovLH( FovY, Aspect, 0.1f, 100.0f );
 
 	ConstantBuffer cb;
-	cb.modelMatrix = XMMatrixTranspose( objProjection );
+	cb.modelMatrix = XMMatrixTranspose( modelViewProjection );
 
 	D3D11_MAPPED_SUBRESOURCE mr;
 	d3d11DeviceContext->Map( constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr );
