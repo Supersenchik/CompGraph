@@ -201,7 +201,7 @@ void RenderScene() {
 	u32 stride = sizeof( Vertex );
 	u32 offset = 0;
 	d3d11DeviceContext->IASetVertexBuffers( 0, 1, &vertexBuffer, &stride, &offset );
-	d3d11DeviceContext->IASetIndexBuffer( indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+	d3d11DeviceContext->IASetIndexBuffer( indexBuffer, DXGI_FORMAT_R16_UINT, 0 );
 	d3d11DeviceContext->VSSetShader( vertexShader, nullptr, 0 );
 	d3d11DeviceContext->PSSetShader( pixelShader, nullptr, 0 );
 	d3d11DeviceContext->VSSetConstantBuffers( 0, 1, &constantBuffer );
@@ -280,24 +280,27 @@ HRESULT CreateObject() {
 	if( FAILED( result ) )
 		return result;
 
-	// создание вершинного буфера
-	Vertex vertices[] = {
-		{ DirectX::XMFLOAT3( -0.50f, -0.50f, 0.50f ), DirectX::XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
-		{ DirectX::XMFLOAT3( -0.50f, 0.50f, 0.50f ), DirectX::XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) },
-		{ DirectX::XMFLOAT3( 0.50f, -0.50f, 0.50f ), DirectX::XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
-		{ DirectX::XMFLOAT3( 0.50f, 0.50f, 0.50f ), DirectX::XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
+	using namespace DirectX;
 
-		{ DirectX::XMFLOAT3( -0.50f, -0.50f, -0.50f ), DirectX::XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
-		{ DirectX::XMFLOAT3( -0.50f, 0.50f, -0.50f ), DirectX::XMFLOAT4( 1.0f, 1.0f, 0.0f, 1.0f ) },
-		{ DirectX::XMFLOAT3( 0.50f, -0.50f, -0.50f ), DirectX::XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
-		{ DirectX::XMFLOAT3( 0.50f, 0.50f, -0.50f ), DirectX::XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) },
+	// создание вершинного буфера
+	const Vertex vertices[] = {
+		{ XMFLOAT3( -0.50f, -0.50f, 0.50f ), XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) },
+		{ XMFLOAT3( -0.50f, 0.50f, 0.50f ), XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) },
+		{ XMFLOAT3( 0.50f, -0.50f, 0.50f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
+		{ XMFLOAT3( 0.50f, 0.50f, 0.50f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
+
+		{ XMFLOAT3( -0.50f, -0.50f, -0.50f ), XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f ) },
+		{ XMFLOAT3( -0.50f, 0.50f, -0.50f ), XMFLOAT4( 1.0f, 1.0f, 0.0f, 1.0f ) },
+		{ XMFLOAT3( 0.50f, -0.50f, -0.50f ), XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
+		{ XMFLOAT3( 0.50f, 0.50f, -0.50f ), XMFLOAT4( 1.0f, 0.0f, 1.0f, 1.0f ) },
 	};
 	D3D11_BUFFER_DESC bd;
 	memset( &bd, 0, sizeof( bd ) );
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_IMMUTABLE;
 	bd.ByteWidth = sizeof( vertices );
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
+	bd.StructureByteStride = sizeof( Vertex );
 
 	D3D11_SUBRESOURCE_DATA subData;
 	memset( &subData, 0, sizeof( subData ) );
@@ -307,7 +310,7 @@ HRESULT CreateObject() {
 		return result;
 
 	// создание буфера индексов
-	u32 indices[] = {
+	const u16 indices[] = {
 		0, 1, 2,
 		1, 3, 2,
 
@@ -327,12 +330,11 @@ HRESULT CreateObject() {
 		6, 4, 0,
 	};
 	memset( &bd, 0, sizeof( bd ) );
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_IMMUTABLE;
 	bd.ByteWidth = sizeof( indices );
 	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bd.CPUAccessFlags = 0;
-
-	memset( &subData, 0, sizeof( subData ) );
+	bd.StructureByteStride = sizeof( u16 );
 	subData.pSysMem = indices;
 	result = d3d11Device->CreateBuffer( &bd, &subData, &indexBuffer );
 	if( FAILED( result ) )
@@ -340,10 +342,11 @@ HRESULT CreateObject() {
 
 	// создание константного буфера
 	memset( &bd, 0, sizeof( bd ) );
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_DYNAMIC;
 	bd.ByteWidth = sizeof( ConstantBuffer );
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = 0;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd.StructureByteStride = sizeof( ConstantBuffer );
 	result = d3d11Device->CreateBuffer( &bd, nullptr, &constantBuffer );
 	if( FAILED( result ) )
 		return result;
@@ -358,7 +361,12 @@ void Rotate() {
 	DirectX::XMFLOAT3 pos( 1, 1, 1 );
 	DirectX::XMVECTOR normal = DirectX::XMLoadFloat3( &pos );
 	objProjection = DirectX::XMMatrixRotationAxis( normal, angle );
+
 	ConstantBuffer cb;
 	cb.modelMatrix = XMMatrixTranspose( objProjection );
-	d3d11DeviceContext->UpdateSubresource( constantBuffer, 0, nullptr, &cb, 0, 0 );
+
+	D3D11_MAPPED_SUBRESOURCE mr;
+	d3d11DeviceContext->Map( constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mr );
+	memcpy( mr.pData, &cb, sizeof( cb ) );
+	d3d11DeviceContext->Unmap( constantBuffer, 0 );
 }
