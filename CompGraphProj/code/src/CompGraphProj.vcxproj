@@ -21,18 +21,19 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{111EB134-29A0-41B7-83BB-6072B69384D1}</ProjectGuid>
     <RootNamespace>CompGraphProj</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -45,7 +46,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -73,8 +74,6 @@
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x64;</LibraryPath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)Include;</IncludePath>
     <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>$(SolutionDir)\bin64\</OutDir>
     <IntDir>$(SolutionDir)\temp\</IntDir>
@@ -86,8 +85,6 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)Include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x64;</LibraryPath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)Include;</IncludePath>
     <IntDir>$(SolutionDir)\temp\</IntDir>
     <OutDir>$(SolutionDir)\bin64\</OutDir>
   </PropertyGroup>
@@ -98,6 +95,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\3dparty\sdl2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -136,7 +135,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(SolutionDir)\temp\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(SolutionDir)\temp\$(TargetName).pgd</ProfileGuidedDatabase>
-      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;d3d11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
@@ -144,6 +143,7 @@
       <EntryPointSymbol>
       </EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -181,7 +181,8 @@
       <ProgramDatabaseFile>$(SolutionDir)\temp\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(SolutionDir)\temp\$(TargetName).pgd</ProfileGuidedDatabase>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;d3d11.lib;D3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\3dparty\sdl2\lib\x64\SDL2.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

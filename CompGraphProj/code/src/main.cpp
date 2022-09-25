@@ -1,7 +1,9 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
+
 #include <d3d11.h>
-#include <D3Dcompiler.h>
+#include <d3dcompiler.h>
+
 #include <DirectXMath.h>
 
 using u8 = uint8_t;
